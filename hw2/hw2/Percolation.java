@@ -1,12 +1,5 @@
 package hw2;
-
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
-import org.junit.Test;
-
-import javax.print.attribute.standard.MediaSize;
-import java.awt.desktop.AboutEvent;
-import java.util.zip.CRC32;
-
 
 public class Percolation {
     // create N-by-N grid, with all sites initially blocked
@@ -66,16 +59,16 @@ public class Percolation {
     }
 
     /** check and update current and neighbor status*/
-    private void updateOpenAndFull(int currentRow, int currentCol, int neighborRow, int neighborCol) {
-        boolean isNeighborUnionFull = isSetFull(neighborRow, neighborCol);
-        boolean isCurrentFull = isFull(currentRow, currentCol);
-        int neighborIndex = toIndex(neighborRow, neighborCol);
-        int currentIndex = toIndex(currentRow, currentCol);
+    private void updateOpenAndFull(int curRow, int curCol, int nbrRow, int nbrCol) {
+        boolean isNeighborUnionFull = isSetFull(nbrRow, nbrCol);
+        boolean isCurrentFull = isFull(curRow, curCol);
+        int neighborIndex = toIndex(nbrRow, nbrCol);
+        int currentIndex = toIndex(curRow, curCol);
 
         if (isCurrentFull && !isNeighborUnionFull) {
-            updateFullSiteAndSet(neighborRow, neighborCol);
+            updateFullSiteAndSet(nbrRow, nbrCol);
         } else if (!isCurrentFull && isNeighborUnionFull) {
-            updateFullSiteAndSet(currentRow, currentCol);
+            updateFullSiteAndSet(curRow, curCol);
         }
         openSet.union(currentIndex, neighborIndex);
     }
