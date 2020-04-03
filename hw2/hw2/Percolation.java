@@ -11,8 +11,41 @@ public class Percolation {
     private WeightedQuickUnionUF openSet; // set to track union
     private int[] openLastRow; // to keep track the column of open site in last row
     private int sizeOpenLastRow; // keep track of the number
-    private boolean[] isRowFull;
-    private int numRowFull;
+    private boolean[] isRowOpen;
+    private int numRowOpen;
+
+    public Percolation(int N) {
+        if (N <= 0) {
+            throw new java.lang.IllegalArgumentException();
+        }
+        size = N;
+        openSite = 0;
+        openState = new boolean[N][N];
+        fullState = new boolean[N][N];
+        isRowOpen = new boolean[N];
+        openLastRow = new int[N];
+        sizeOpenLastRow = 0;
+        numRowOpen = 0;
+        isPercolate = false;
+        /** let 0 be the root, with  */
+        for (int i = 0; i < N; i += 1) {
+            for (int j = 0; j < N; j += 1) {
+                openState[i][j] = false;
+                fullState[i][j] = false;
+            }
+            isRowOpen[i] = false;
+        }
+        openSet =  new WeightedQuickUnionUF(N * N); // every site is a one-element set
+
+    }
+
+    private void validateRowCol(int row, int col) {
+        if (row > (size - 1) || col > (size  - 1)) {
+            throw new java.lang.IndexOutOfBoundsException();
+        } else if (row < 0 || col < 0) {
+            throw new java.lang.IndexOutOfBoundsException();
+        }
+    }
 
     private int toIndex(int row, int col) {
         return (row * size) + col;
@@ -33,38 +66,11 @@ public class Percolation {
         }
     }
 
-    private void validateRowCol(int row, int col) {
-        if (row > (size - 1) || col > (size  - 1)) {
-            throw new java.lang.IndexOutOfBoundsException();
-        } else if (row < 0 || col < 0) {
-            throw new java.lang.IndexOutOfBoundsException();
+    private void updateIsRowOpen(int row, int col) {
+        if (!isRowOpen[row]) {
+            isRowOpen[row] = true;
+            numRowOpen += 1;
         }
-    }
-
-    public Percolation(int N) {
-        if (N <= 0) {
-            throw new java.lang.IllegalArgumentException();
-        }
-        size = N;
-        openSite = 0;
-        openState = new boolean[N][N];
-        fullState = new boolean[N][N];
-        isRowFull = new boolean[N];
-        openLastRow = new int[N];
-        sizeOpenLastRow = 0;
-        numRowFull = 0;
-        isPercolate = false;
-        /** let 0 be the root, with  */
-        for (int i = 0; i < N; i += 1) {
-            for (int j = 0; j < N; j += 1) {
-                openState[i][j] = false;
-                fullState[i][j] = false;
-            }
-            isRowFull[i] = false;
-        }
-        // every site is a one-element set
-        openSet =  new WeightedQuickUnionUF(N * N);
-
     }
 
     /** check the site and its set root is full */
@@ -140,22 +146,6 @@ public class Percolation {
         return isLeftFull || isRightFull || isUpFull || isDownFull;
     }
 
-    private void updatePercolate(int row, int col) {
-        if (row == this.size - 1) {
-            isPercolate = isPercolate || isFull(row, col);
-        }
-        // TODO this makes theta-N time...
-        for (int i = 0; i < sizeOpenLastRow; i += 1) {
-            isPercolate = isPercolate || isFull(this.size - 1, openLastRow[i]);
-        }
-    }
-
-    private void updatePercolation() {
-        for (int i = 0; i < sizeOpenLastRow; i += 1) {
-            isPercolate = isPercolate || isFull(this.size - 1, openLastRow[i]);
-        }
-    }
-
     /** open the site (row, col) if it is not open already*/
     public void open(int row, int col) {
         validateRowCol(row, col);
@@ -171,6 +161,8 @@ public class Percolation {
 
             // record open last row
             updateOpenLastRow(row, col);
+            // record row open
+            updateIsRowOpen(row, col);
             // update openSet by checking neighbor
             updateOpenSet(row, col);
             //updatePercolate(row, col);
@@ -191,7 +183,6 @@ public class Percolation {
         // update itself with root state
         fullState[row][col] = fullState[row][col] || fullState[rootRow][rootCol];
 
-        isRowFull[row] = isRowFull[row] || fullState[row][col];
         if (row == this.size - 1) {
             isPercolate = isPercolate || fullState[row][col];
         }
@@ -206,6 +197,14 @@ public class Percolation {
     /** number of open sites */
     public int numberOfOpenSites() {
         return openSite;
+    }
+
+    private void updatePercolation() {
+        if (numRowOpen == size) {
+            for (int i = 0; i < sizeOpenLastRow; i += 1) {
+                isPercolate = isPercolate || isFull(this.size - 1, openLastRow[i]);
+            }
+        }
     }
 
     /** does the system percolate?
