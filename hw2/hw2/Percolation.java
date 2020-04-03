@@ -8,9 +8,11 @@ public class Percolation {
     private boolean[][] openState; // open: true, close: false
     private boolean[][] fullState; // open: true, close: false
     private boolean isPercolate;
-    private WeightedQuickUnionUF openSet;
-    private int[] openLastRow;
-    private int sizeOpenLastRow;
+    private WeightedQuickUnionUF openSet; // set to track union
+    private int[] openLastRow; // to keep track the column of open site in last row
+    private int sizeOpenLastRow; // keep track of the number
+    private boolean[] isRowFull;
+    private int numRowFull;
 
     private int toIndex(int row, int col) {
         return (row * size) + col;
@@ -25,7 +27,7 @@ public class Percolation {
     }
 
     private void updateOpenLastRow(int row, int col) {
-        if (row == size -1) {
+        if (row == size - 1) {
             openLastRow[sizeOpenLastRow] = col;
             sizeOpenLastRow += 1;
         }
@@ -47,8 +49,10 @@ public class Percolation {
         openSite = 0;
         openState = new boolean[N][N];
         fullState = new boolean[N][N];
+        isRowFull = new boolean[N];
         openLastRow = new int[N];
         sizeOpenLastRow = 0;
+        numRowFull = 0;
         isPercolate = false;
         /** let 0 be the root, with  */
         for (int i = 0; i < N; i += 1) {
@@ -56,6 +60,7 @@ public class Percolation {
                 openState[i][j] = false;
                 fullState[i][j] = false;
             }
+            isRowFull[i] = false;
         }
         // every site is a one-element set
         openSet =  new WeightedQuickUnionUF(N * N);
@@ -166,12 +171,10 @@ public class Percolation {
 
             // record open last row
             updateOpenLastRow(row, col);
-
             // update openSet by checking neighbor
             updateOpenSet(row, col);
-
-            openSite += 1;
             updatePercolate(row, col);
+            openSite += 1;
         }
     }
 
@@ -189,6 +192,7 @@ public class Percolation {
         int rootCol = toCol(rootIndex);
         // update itself with root state
         fullState[row][col] = fullState[row][col] || fullState[rootRow][rootCol];
+        //if ()
         if (row == this.size - 1) {
             isPercolate = isPercolate || fullState[row][col];
         }
