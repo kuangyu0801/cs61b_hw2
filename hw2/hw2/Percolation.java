@@ -9,6 +9,8 @@ public class Percolation {
     private boolean[][] fullState; // open: true, close: false
     private boolean isPercolate;
     private WeightedQuickUnionUF openSet;
+    private int[] openLastRow;
+    private int sizeOpenLastRow;
 
     private int toIndex(int row, int col) {
         return (row * size) + col;
@@ -20,6 +22,13 @@ public class Percolation {
 
     private int toCol(int index) {
         return index % this.size;
+    }
+
+    private void updateOpenLastRow(int row, int col) {
+        if (row == size -1) {
+            openLastRow[sizeOpenLastRow] = col;
+            sizeOpenLastRow += 1;
+        }
     }
 
     private void validateRowCol(int row, int col) {
@@ -38,6 +47,8 @@ public class Percolation {
         openSite = 0;
         openState = new boolean[N][N];
         fullState = new boolean[N][N];
+        openLastRow = new int[N];
+        sizeOpenLastRow = 0;
         isPercolate = false;
         /** let 0 be the root, with  */
         for (int i = 0; i < N; i += 1) {
@@ -121,7 +132,6 @@ public class Percolation {
         boolean isDownFull = (row + 1 >= this.size) ? false : this.isFull(row + 1, col);
         boolean isLeftFull = (col - 1 < 0) ? false : this.isFull(row, col - 1);
         boolean isRightFull = (col + 1 >= this.size) ? false : this.isFull(row, col + 1);
-        //boolean isSetFull = isSetFull(row, col);
         return isLeftFull || isRightFull || isUpFull || isDownFull;
     }
 
@@ -130,14 +140,14 @@ public class Percolation {
             isPercolate = isPercolate || isFull(row, col);
         }
         // TODO this makes theta-N time...
-        for (int i = 0; i < this.size; i += 1) {
-            isPercolate = isPercolate || isFull(this.size - 1, i);
+        for (int i = 0; i < sizeOpenLastRow; i += 1) {
+            isPercolate = isPercolate || isFull(this.size - 1, openLastRow[i]);
         }
     }
 
     private void updatePercolation() {
-        for (int i = 0; i < this.size; i += 1) {
-            isPercolate = isPercolate || isFull(this.size - 1, i);
+        for (int i = 0; i < sizeOpenLastRow; i += 1) {
+            isPercolate = isPercolate || isFull(this.size - 1, openLastRow[i]);
         }
     }
 
@@ -153,8 +163,13 @@ public class Percolation {
             if ((row == 0) || isNeighborOrSetFull(row, col)) {
                 fullState[row][col] = true;
             }
+
+            // record open last row
+            updateOpenLastRow(row, col);
+
             // update openSet by checking neighbor
             updateOpenSet(row, col);
+
             openSite += 1;
             updatePercolate(row, col);
         }
@@ -188,7 +203,7 @@ public class Percolation {
     /** does the system percolate?
      * if any bottom is connected with any top then it will percolate*/
     public boolean percolates() {
-        updatePercolation();
+        // updatePercolation();
         return isPercolate;
     }
 
