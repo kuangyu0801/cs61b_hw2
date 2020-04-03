@@ -87,7 +87,7 @@ public class Percolation {
 
     /** check and update current and neighbor status*/
     private void updateOpenAndFull(int curRow, int curCol, int nbrRow, int nbrCol) {
-        boolean isNeighborUnionFull = isSetFull(nbrRow, nbrCol);
+        boolean isNeighborUnionFull = isFull(nbrRow, nbrCol);
         boolean isCurrentFull = isFull(curRow, curCol);
         int neighborIndex = toIndex(nbrRow, nbrCol);
         int currentIndex = toIndex(curRow, curCol);
@@ -135,11 +135,8 @@ public class Percolation {
     private boolean isNeighborOrSetFull(int row, int col) {
         boolean isUpFull = (row - 1 < 0) ? false : fullState[row - 1][col];
         boolean isDownFull = (row + 1 >= this.size) ? false : fullState[row + 1][col];
-                //this.isFull(row + 1, col);
         boolean isLeftFull = (col - 1 < 0) ? false : fullState[row][col - 1];
-        //this.isFull(row, col - 1);
         boolean isRightFull = (col + 1 >= this.size) ? false : fullState[row][col + 1];
-                //this.isFull(row, col + 1);
         return isLeftFull || isRightFull || isUpFull || isDownFull;
     }
 
@@ -176,7 +173,7 @@ public class Percolation {
             updateOpenLastRow(row, col);
             // update openSet by checking neighbor
             updateOpenSet(row, col);
-            updatePercolate(row, col);
+            //updatePercolate(row, col);
             openSite += 1;
         }
     }
@@ -187,18 +184,22 @@ public class Percolation {
         return openState[row][col];
     }
 
-    /** is the site (row, col) full? */
-    public boolean isFull(int row, int col) {
-        validateRowCol(row, col);
+    private void isFullHelper(int row, int col) {
         int rootIndex = openSet.find(toIndex(row, col));
         int rootRow = toRow(rootIndex);
         int rootCol = toCol(rootIndex);
         // update itself with root state
         fullState[row][col] = fullState[row][col] || fullState[rootRow][rootCol];
+
         isRowFull[row] = isRowFull[row] || fullState[row][col];
         if (row == this.size - 1) {
             isPercolate = isPercolate || fullState[row][col];
         }
+    }
+    /** is the site (row, col) full? */
+    public boolean isFull(int row, int col) {
+        validateRowCol(row, col);
+        isFullHelper(row, col);
         return fullState[row][col];
     }
 
@@ -210,7 +211,7 @@ public class Percolation {
     /** does the system percolate?
      * if any bottom is connected with any top then it will percolate*/
     public boolean percolates() {
-        // updatePercolation();
+        updatePercolation();
         return isPercolate;
     }
 
