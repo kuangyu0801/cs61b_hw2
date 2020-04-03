@@ -1,14 +1,14 @@
 package hw2;
 
 import edu.princeton.cs.algs4.StdStats;
-import edu.princeton.cs.introcs.StdStats.*;
-import static edu.princeton.cs.introcs.StdRandom.*;
+import edu.princeton.cs.algs4.StdRandom;
 
 /**
  * Repeat the following until the system percolates:
  * 1.Choose a site uniformly at random among all blocked sites.
  * 2.Open the site.
- * 3.The fraction of sites that are opened when the system percolates provides an estimate of the percolation threshold.
+ * 3.The fraction of sites that are opened when the system percolates
+ * provides an estimate of the percolation threshold.
 */
 public class PercolationStats {
     private static final double CONFIDENT_CONSTANT = 1.96;
@@ -32,7 +32,7 @@ public class PercolationStats {
 
     // perform T independent experiments on an N-by-N grid
     public PercolationStats(int N, int T, PercolationFactory pf) {
-        if( N < 0 || T < 0) {
+        if (N < 0 || T < 0) {
             throw new java.lang.IllegalArgumentException();
         }
         size = N;
@@ -43,7 +43,7 @@ public class PercolationStats {
         for (int i = 0; i < iteration; i += 1) {
             perc = pf.make(N);
             while (!perc.percolates()) {
-                int randomIndex = uniform(totalSite);
+                int randomIndex = StdRandom.uniform(totalSite);
                 perc.open(toRow(randomIndex), toCol(randomIndex));
             }
             thredhold[i] = (double) perc.numberOfOpenSites() / totalSite;
