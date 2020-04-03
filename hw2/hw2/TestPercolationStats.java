@@ -10,6 +10,8 @@ public class TestPercolationStats {
         PercolationStats myPercolationStats = new PercolationStats(3, 2, pf);
         System.out.println("Percolation mean: " + myPercolationStats.mean());
         System.out.println("Percolation standard variation:" + myPercolationStats.stddev());
-        System.out.println("95% confidence threshold: [" + myPercolationStats.confidenceLow() + "," + myPercolationStats.confidenceHigh() + "]");
+        double confLow = myPercolationStats.confidenceLow();
+        double confHigh = myPercolationStats.confidenceHigh();
+        System.out.println("95% confidence threshold: [" + confLow + "," + confHigh + "]");
     }
 }
