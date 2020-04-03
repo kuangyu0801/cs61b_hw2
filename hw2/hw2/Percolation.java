@@ -22,7 +22,18 @@ public class Percolation {
         return index % this.size;
     }
 
+    private void validateRowCol(int row, int col) {
+        if (row > (size - 1) || col > (size  - 1)) {
+            throw new java.lang.IndexOutOfBoundsException();
+        } else if (row < 0 || col < 0) {
+            throw new java.lang.IndexOutOfBoundsException();
+        }
+    }
+
     public Percolation(int N) {
+        if (N <= 0) {
+            throw new java.lang.IllegalArgumentException();
+        }
         size = N;
         openSite = 0;
         openState = new boolean[N][N];
@@ -132,12 +143,7 @@ public class Percolation {
 
     /** open the site (row, col) if it is not open already*/
     public void open(int row, int col) {
-
-        if (row > (size - 1) || col > (size  - 1)) {
-            throw new java.lang.IndexOutOfBoundsException();
-        } else if (row < 0 || col < 0) {
-            throw new java.lang.IllegalArgumentException();
-        }
+        validateRowCol(row, col);
 
         if (!openState[row][col]) {
             // setting site to open
@@ -156,21 +162,13 @@ public class Percolation {
 
     /** is the site (row, col) open? */
     public boolean isOpen(int row, int col) {
-        if (row > (size - 1) || col > (size - 1)) {
-            throw new java.lang.IndexOutOfBoundsException();
-        } else if (row < 0 || col < 0) {
-            throw new java.lang.IllegalArgumentException();
-        }
+        validateRowCol(row, col);
         return openState[row][col];
     }
 
     /** is the site (row, col) full? */
     public boolean isFull(int row, int col) {
-        if (row > (size - 1) || col > (size - 1)) {
-            throw new java.lang.IndexOutOfBoundsException();
-        } else if (row < 0 || col < 0) {
-            throw new java.lang.IllegalArgumentException();
-        }
+        validateRowCol(row, col);
         int rootIndex = openSet.find(toIndex(row, col));
         int rootRow = toRow(rootIndex);
         int rootCol = toCol(rootIndex);
