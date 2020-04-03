@@ -133,10 +133,13 @@ public class Percolation {
     }
 
     private boolean isNeighborOrSetFull(int row, int col) {
-        boolean isUpFull = (row - 1 < 0) ? false : this.isFull(row - 1, col);
-        boolean isDownFull = (row + 1 >= this.size) ? false : this.isFull(row + 1, col);
-        boolean isLeftFull = (col - 1 < 0) ? false : this.isFull(row, col - 1);
-        boolean isRightFull = (col + 1 >= this.size) ? false : this.isFull(row, col + 1);
+        boolean isUpFull = (row - 1 < 0) ? false : fullState[row - 1][col];
+        boolean isDownFull = (row + 1 >= this.size) ? false : fullState[row + 1][col];
+                //this.isFull(row + 1, col);
+        boolean isLeftFull = (col - 1 < 0) ? false : fullState[row][col - 1];
+        //this.isFull(row, col - 1);
+        boolean isRightFull = (col + 1 >= this.size) ? false : fullState[row][col + 1];
+                //this.isFull(row, col + 1);
         return isLeftFull || isRightFull || isUpFull || isDownFull;
     }
 
@@ -192,7 +195,7 @@ public class Percolation {
         int rootCol = toCol(rootIndex);
         // update itself with root state
         fullState[row][col] = fullState[row][col] || fullState[rootRow][rootCol];
-        //if ()
+        isRowFull[row] = isRowFull[row] || fullState[row][col];
         if (row == this.size - 1) {
             isPercolate = isPercolate || fullState[row][col];
         }
